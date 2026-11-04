@@ -61,7 +61,7 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
     glassMaterials.forEach(m=>{m.uniforms.uScreenResolutionPx.value.set(width*renderer.getPixelRatio(),height*renderer.getPixelRatio());m.uniforms.uLoop.value=mobile?2:3;});
     stickers.forEach(s=>s.mesh.scale.copy(s.baseScale).multiplyScalar(mobile?.45:1));
     passes.forEach((pass,i)=>{if(pass.uniforms.uTrackMouse)pass.uniforms.uTrackMouse.value=+!mobile; if(pass.uniforms.uPos)pass.uniforms.uPos.value=mobile?new THREE.Vector2(.5,-.1):(i<3?smooth:new THREE.Vector2(.5,i===4?-.1:.5));});
-    if(hello){const worldWidth=2*Math.tan(THREE.MathUtils.degToRad(20))*20*camera.aspect;hello.scale.setScalar(mobile?Math.min(19,worldWidth/.78):22);hello.position.set(-.1,0,2);}
+    if(hello){const worldWidth=2*Math.tan(THREE.MathUtils.degToRad(20))*20*camera.aspect;hello.scale.setScalar(mobile?Math.min(19,worldWidth/.80):23.1);hello.position.set(-.1,0,2);}
     if(contactModel){const worldWidth=2*Math.tan(THREE.MathUtils.degToRad(20))*20*camera.aspect;contactModel.scale.setScalar(mobile?Math.min(19,worldWidth/.85):19);contactModel.position.z=mobile?2:0;}
     if(arrow){const worldWidth=2*Math.tan(THREE.MathUtils.degToRad(20))*25*camera.aspect;arrow.position.set(mobile?worldWidth*.36:11.6,mobile?-2.5:-4.2,-3);arrow.scale.setScalar(mobile?.05:.1);}
   }
@@ -75,7 +75,7 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
   }
   function glass(geometry,vertexShader,fragmentShader,isArrow){
     const m=new THREE.ShaderMaterial({vertexShader,fragmentShader,toneMapped:false,transparent:true,uniforms:{
-      uGlassOpacity:u(1),uHeroOptics:u(0),uOpticsTime:u(0),uOpticsPointer:u(smooth),uTexture:u(refraction.texture),uIorR:u(1.15),uIorY:u(1.16),uIorG:u(1.18),uIorC:u(1.22),uIorB:u(1.22),uIorP:u(1.22),uRefractPower:u(.72),uChromaticAberration:u(.14),uSaturation:u(1.2),uShininess:u(120),uDiffuseness:u(.1),uFresnelPower:u(1),uBrightness:u(.78),uContrast:u(.9),uGamma:u(1),uSpecularStrength:u(1.2),uFresnelStrength:u(.24),uFresnelSideDir:u(new THREE.Vector3(-1,1,-1)),uTintColorA:u(new THREE.Vector4()),uTintColorB:u(new THREE.Vector4()),uTintLocalYRange:u(new THREE.Vector2(geometry.boundingBox.min.y,geometry.boundingBox.max.y)),uTintEnabled:u(1),uTintMix:u(1),uTintThicknessMinAlpha:u(1),uTintThicknessMaxAlpha:u(.92),uDark:u(0),uLoop:u(mobile?2:3),uSceneRefractionEnabled:u(1),uRgbRefraction:u(1),uLight:u(new THREE.Vector3(4,9,.5)),uScreenResolutionPx:u(new THREE.Vector2())
+      uGlossRibbon:u(1),uGlassOpacity:u(1),uHeroOptics:u(0),uOpticsTime:u(0),uOpticsPointer:u(smooth),uTexture:u(refraction.texture),uIorR:u(1.15),uIorY:u(1.16),uIorG:u(1.18),uIorC:u(1.22),uIorB:u(1.22),uIorP:u(1.22),uRefractPower:u(.72),uChromaticAberration:u(.14),uSaturation:u(1.2),uShininess:u(120),uDiffuseness:u(.1),uFresnelPower:u(1),uBrightness:u(.78),uContrast:u(.9),uGamma:u(1),uSpecularStrength:u(1.2),uFresnelStrength:u(.24),uFresnelSideDir:u(new THREE.Vector3(-1,1,-1)),uTintColorA:u(new THREE.Vector4()),uTintColorB:u(new THREE.Vector4()),uTintLocalYRange:u(new THREE.Vector2(geometry.boundingBox.min.y,geometry.boundingBox.max.y)),uTintEnabled:u(1),uTintMix:u(1),uTintThicknessMinAlpha:u(1),uTintThicknessMaxAlpha:u(.92),uDark:u(0),uLoop:u(mobile?2:3),uSceneRefractionEnabled:u(1),uRgbRefraction:u(1),uLight:u(new THREE.Vector3(4,9,.5)),uScreenResolutionPx:u(new THREE.Vector2())
     }});m.userData.isArrow=isArrow;glassMaterials.push(m);resources.push(m);return m;
   }
   function setTheme(value){
@@ -127,7 +127,7 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
   let tunnelMat, tunnelMesh,arrowStripe;
   try{
     fluid=await createFluidEffect(renderer);
-    const [vs,fs,...results]=await Promise.all([fetchText('glass.vert'),fetchText('glass.frag?v=reference-glass-3'),...Array.from({length:6},(_,i)=>fetchText(`background-${i}.frag`)),loadModel(base+'hello.gltf'),loadModel(base+'cursor.glb'),...Array.from({length:12},(_,i)=>track(new THREE.TextureLoader().loadAsync(base+`s_${String(i+1).padStart(2,'0')}.png`))),fetchText('flare.frag'),fetchText('composite.frag')]);
+    const [vs,fs,...results]=await Promise.all([fetchText('glass.vert'),fetchText('glass.frag?v=jelly-hello-4'),...Array.from({length:6},(_,i)=>fetchText(`background-${i}.frag`)),loadModel(base+'hello.gltf'),loadModel(base+'cursor.glb'),...Array.from({length:12},(_,i)=>track(new THREE.TextureLoader().loadAsync(base+`s_${String(i+1).padStart(2,'0')}.png`))),fetchText('flare.frag'),fetchText('composite.frag')]);
     if(disposed)return;
     const shaders=results.slice(0,6),helloGltf=results[6],arrowGltf=results[7];stickerTextures=results.slice(8,20);stickerTextures.forEach(t=>{t.colorSpace=THREE.SRGBColorSpace;resources.push(t);});
     passes=[
@@ -139,7 +139,24 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
       material(shaders[5],{uBgColor:u(color('#ffead6')),uOutputColor:u(color('#acffb9')),uLoaded:u(1),uOutputMix:u(.65)})
     ];
     const background=new THREE.Mesh(new THREE.PlaneGeometry(2,2),passes[5]);background.frustumCulled=false;background.renderOrder=-100;scene.add(background);resources.push(background.geometry);
-    const hg=merged(helloGltf);hello=new THREE.Mesh(hg,glass(hg,vs,fs,false));scene.add(hello);
+    const helloGeometry=merged(helloGltf);
+    const {min,max}=helloGeometry.boundingBox;
+    const thickness=(max.y-min.y)*.009;
+    const {position,normal}=helloGeometry.attributes;
+    for(let i=0;i<position.count;i++){
+      position.setXYZ(i,
+        position.getX(i)+normal.getX(i)*thickness,
+        position.getY(i)+normal.getY(i)*thickness,
+        position.getZ(i)+normal.getZ(i)*thickness);
+    }
+    position.needsUpdate=true;
+    helloGeometry.computeBoundingBox();
+    helloGeometry.computeBoundingSphere();
+    const helloMaterial=glass(helloGeometry,vs,fs,false);
+    helloMaterial.uniforms.uGlossRibbon.value=.68;
+    helloMaterial.uniforms.uSpecularStrength.value=.98;
+    hello=new THREE.Mesh(helloGeometry,helloMaterial);
+    scene.add(hello);
     const ag=merged(arrowGltf);arrow=new THREE.Mesh(ag,glass(ag,vs,fs,true));arrow.renderOrder=12;scene.add(arrow);
     flareMaterial=material(results[20].replace(/#include\s+<colorspace_fragment>/g,''),{tDiffuse:u(fullTarget.texture),uResolution:u(new THREE.Vector2()),uEnabled:u(1),uIntensity:u(.7),uThreshold:u(.99),uStreakScale:u(8),uHotspotPower:u(32),uGate:u(.88),uStarRays:u(6),uTailColor:u(color("#ffa300"))});
     compositeMaterial=material(results[21],{tBase:u(fullTarget.texture),tFlare:u(flareTarget.texture)});

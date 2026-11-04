@@ -1,3 +1,4 @@
+uniform float uGlossRibbon;
 uniform float uHeroOptics;
 uniform float uGlassOpacity;
 uniform float uOpticsTime;
@@ -219,7 +220,7 @@ void main() {
   float ribbon = exp(-ribbonDistance * ribbonDistance / (.055 * .055));
   float softRibbon = exp(-ribbonDistance * ribbonDistance / (.21 * .21));
   float rim = pow(1.0 - abs(dot(normal, eyeDir)), 2.5);
-  color += uHeroOptics * (ribbon * .30 + softRibbon * .045)
+  color += uHeroOptics * (ribbon * .30 + softRibbon * .045) * uGlossRibbon
            * mix(vec3(.78, .89, 1.0), vec3(1.0, .96, .90), proximity);
   color += uHeroOptics * rim * vec3(.035, .065, .10);
 
