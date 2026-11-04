@@ -75,7 +75,7 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
   }
   function glass(geometry,vertexShader,fragmentShader,isArrow){
     const m=new THREE.ShaderMaterial({vertexShader,fragmentShader,toneMapped:false,transparent:true,uniforms:{
-      uHeroOptics:u(0),uOpticsTime:u(0),uOpticsPointer:u(smooth),uTexture:u(refraction.texture),uIorR:u(1.15),uIorY:u(1.16),uIorG:u(1.18),uIorC:u(1.22),uIorB:u(1.22),uIorP:u(1.22),uRefractPower:u(.72),uChromaticAberration:u(.14),uSaturation:u(1.2),uShininess:u(120),uDiffuseness:u(.1),uFresnelPower:u(1),uBrightness:u(.78),uContrast:u(.9),uGamma:u(1),uSpecularStrength:u(1.2),uFresnelStrength:u(.24),uFresnelSideDir:u(new THREE.Vector3(-1,1,-1)),uTintColorA:u(new THREE.Vector4()),uTintColorB:u(new THREE.Vector4()),uTintLocalYRange:u(new THREE.Vector2(geometry.boundingBox.min.y,geometry.boundingBox.max.y)),uTintEnabled:u(1),uTintMix:u(1),uTintThicknessMinAlpha:u(1),uTintThicknessMaxAlpha:u(.92),uDark:u(0),uLoop:u(mobile?2:3),uSceneRefractionEnabled:u(1),uRgbRefraction:u(1),uLight:u(new THREE.Vector3(4,9,.5)),uScreenResolutionPx:u(new THREE.Vector2())
+      uGlassOpacity:u(1),uHeroOptics:u(0),uOpticsTime:u(0),uOpticsPointer:u(smooth),uTexture:u(refraction.texture),uIorR:u(1.15),uIorY:u(1.16),uIorG:u(1.18),uIorC:u(1.22),uIorB:u(1.22),uIorP:u(1.22),uRefractPower:u(.72),uChromaticAberration:u(.14),uSaturation:u(1.2),uShininess:u(120),uDiffuseness:u(.1),uFresnelPower:u(1),uBrightness:u(.78),uContrast:u(.9),uGamma:u(1),uSpecularStrength:u(1.2),uFresnelStrength:u(.24),uFresnelSideDir:u(new THREE.Vector3(-1,1,-1)),uTintColorA:u(new THREE.Vector4()),uTintColorB:u(new THREE.Vector4()),uTintLocalYRange:u(new THREE.Vector2(geometry.boundingBox.min.y,geometry.boundingBox.max.y)),uTintEnabled:u(1),uTintMix:u(1),uTintThicknessMinAlpha:u(1),uTintThicknessMaxAlpha:u(.92),uDark:u(0),uLoop:u(mobile?2:3),uSceneRefractionEnabled:u(1),uRgbRefraction:u(1),uLight:u(new THREE.Vector3(4,9,.5)),uScreenResolutionPx:u(new THREE.Vector2())
     }});m.userData.isArrow=isArrow;glassMaterials.push(m);resources.push(m);return m;
   }
   function setTheme(value){
@@ -127,7 +127,7 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
   let tunnelMat, tunnelMesh,arrowStripe;
   try{
     fluid=await createFluidEffect(renderer);
-    const [vs,fs,...results]=await Promise.all([fetchText('glass.vert'),fetchText('glass.frag'),...Array.from({length:6},(_,i)=>fetchText(`background-${i}.frag`)),loadModel(base+'hello.gltf'),loadModel(base+'cursor.glb'),...Array.from({length:12},(_,i)=>track(new THREE.TextureLoader().loadAsync(base+`s_${String(i+1).padStart(2,'0')}.png`))),fetchText('flare.frag'),fetchText('composite.frag')]);
+    const [vs,fs,...results]=await Promise.all([fetchText('glass.vert'),fetchText('glass.frag?v=soft-glass-2'),...Array.from({length:6},(_,i)=>fetchText(`background-${i}.frag`)),loadModel(base+'hello.gltf'),loadModel(base+'cursor.glb'),...Array.from({length:12},(_,i)=>track(new THREE.TextureLoader().loadAsync(base+`s_${String(i+1).padStart(2,'0')}.png`))),fetchText('flare.frag'),fetchText('composite.frag')]);
     if(disposed)return;
     const shaders=results.slice(0,6),helloGltf=results[6],arrowGltf=results[7];stickerTextures=results.slice(8,20);stickerTextures.forEach(t=>{t.colorSpace=THREE.SRGBColorSpace;resources.push(t);});
     passes=[
@@ -191,7 +191,10 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
       hello.rotation.set(0,THREE.MathUtils.degToRad(240)*(1-entryEase)+state.heroExit*Math.PI/2,THREE.MathUtils.degToRad(4));
       hello.position.y=reducedMotion||mobile?0:Math.sin(elapsed*1.2)*.18+Math.sin(elapsed*.6)*.06;
       hello.position.y+=(scrollY/height)*16*.72;hello.visible=state.heroExit<1;
-      contactModel.visible=state.contact>0;contactModel.rotation.x=reducedMotion?0:-(1-ease(state.contact))*Math.PI;contactModel.position.y=-(1-state.contact)*16*.72;
+      const contactReveal=ease(state.contact);
+      contactModel.visible=contactReveal>0;
+      contactModel.material.uniforms.uGlassOpacity.value=contactReveal;
+      contactModel.rotation.x=reducedMotion?0:-(1-contactReveal)*Math.PI;contactModel.position.y=-(1-state.contact)*16*.72;
       arrow.rotation.set(pulse*.25,pulse*Math.PI*2+state.heroExit*Math.PI*4,Math.sin(elapsed*.65)*.04);
       if(state.heroExit>.9){
         const top=tunnelTop-scrollY,bottom=top+tunnelEl.offsetHeight,center=height*.5,margin=120;
@@ -218,7 +221,7 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
         const worldW=2*Math.tan(THREE.MathUtils.degToRad(20))*25*camera.aspect;
         arrow.position.set(mobile?worldW*.36:11.6,(mobile?-2.5:-4.2)+(scrollY/height)*16*.72,-3);arrow.scale.setScalar(mobile?.05:.1);arrow.visible=state.heroExit<1;
       }
-      papers.update(dt,width,height);flareMaterial.uniforms.uIntensity.value=.7*state.glass;
+      papers.update(dt,width,height);flareMaterial.uniforms.uIntensity.value=.54*state.glass;
       const lightAngle=Math.atan2(-(smooth.y-.5),-(smooth.x-.5));
       glassMaterials.forEach(m=>{m.uniforms.uHeroOptics.value=m.userData.isContact?ease(state.contact):1-state.heroExit;m.uniforms.uOpticsTime.value=reducedMotion?0:elapsed;m.uniforms.uLight.value.set(pointer.distanceTo(new THREE.Vector2(.5,.5))<.03?4:Math.cos(lightAngle)*9.85,pointer.distanceTo(new THREE.Vector2(.5,.5))<.03?9:Math.sin(lightAngle)*9.85,.5);});
       if(!reducedMotion && elapsed>nextSticker){nextSticker=elapsed+4; if(stickers.length<7)spawn(1);}
