@@ -107,7 +107,7 @@ void main() {
       for (int i = 0; i < uLoop; i++) {
         float slide = float(i) / float(uLoop) * 0.1 + noise;
         float facing = abs(dot(normal, eyeDir));
-        float offset = (uRefractPower + slide) * uChromaticAberration * mix(1.0, .78 + .36 * (1.0-facing), uHeroOptics);
+        float offset = (uRefractPower + slide) * uChromaticAberration * mix(1.0, .85 + .45 * (1.0-facing), uHeroOptics);
 
         color.r += texture2D(uTexture, uv + refractVecR.xy * offset).r;
         color.g += texture2D(uTexture, uv + refractVecG.xy * offset).g;
@@ -216,10 +216,10 @@ void main() {
   float ribbonCoord = dot(reflection, normalize(vec3(.85, .45, .24)));
   float ribbonCenter = .23 + (uOpticsPointer.x - .5) * .18;
   float ribbonDistance = ribbonCoord - ribbonCenter;
-  float ribbon = exp(-ribbonDistance * ribbonDistance / (.085 * .085));
-  float softRibbon = exp(-ribbonDistance * ribbonDistance / (.23 * .23));
+  float ribbon = exp(-ribbonDistance * ribbonDistance / (.055 * .055));
+  float softRibbon = exp(-ribbonDistance * ribbonDistance / (.21 * .21));
   float rim = pow(1.0 - abs(dot(normal, eyeDir)), 2.5);
-  color += uHeroOptics * (ribbon * .19 + softRibbon * .05)
+  color += uHeroOptics * (ribbon * .30 + softRibbon * .045)
            * mix(vec3(.78, .89, 1.0), vec3(1.0, .96, .90), proximity);
   color += uHeroOptics * rim * vec3(.035, .065, .10);
 

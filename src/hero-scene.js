@@ -127,7 +127,7 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
   let tunnelMat, tunnelMesh,arrowStripe;
   try{
     fluid=await createFluidEffect(renderer);
-    const [vs,fs,...results]=await Promise.all([fetchText('glass.vert'),fetchText('glass.frag?v=soft-glass-2'),...Array.from({length:6},(_,i)=>fetchText(`background-${i}.frag`)),loadModel(base+'hello.gltf'),loadModel(base+'cursor.glb'),...Array.from({length:12},(_,i)=>track(new THREE.TextureLoader().loadAsync(base+`s_${String(i+1).padStart(2,'0')}.png`))),fetchText('flare.frag'),fetchText('composite.frag')]);
+    const [vs,fs,...results]=await Promise.all([fetchText('glass.vert'),fetchText('glass.frag?v=reference-glass-3'),...Array.from({length:6},(_,i)=>fetchText(`background-${i}.frag`)),loadModel(base+'hello.gltf'),loadModel(base+'cursor.glb'),...Array.from({length:12},(_,i)=>track(new THREE.TextureLoader().loadAsync(base+`s_${String(i+1).padStart(2,'0')}.png`))),fetchText('flare.frag'),fetchText('composite.frag')]);
     if(disposed)return;
     const shaders=results.slice(0,6),helloGltf=results[6],arrowGltf=results[7];stickerTextures=results.slice(8,20);stickerTextures.forEach(t=>{t.colorSpace=THREE.SRGBColorSpace;resources.push(t);});
     passes=[
@@ -221,7 +221,7 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
         const worldW=2*Math.tan(THREE.MathUtils.degToRad(20))*25*camera.aspect;
         arrow.position.set(mobile?worldW*.36:11.6,(mobile?-2.5:-4.2)+(scrollY/height)*16*.72,-3);arrow.scale.setScalar(mobile?.05:.1);arrow.visible=state.heroExit<1;
       }
-      papers.update(dt,width,height);flareMaterial.uniforms.uIntensity.value=.54*state.glass;
+      papers.update(dt,width,height);flareMaterial.uniforms.uIntensity.value=.7*state.glass;
       const lightAngle=Math.atan2(-(smooth.y-.5),-(smooth.x-.5));
       glassMaterials.forEach(m=>{m.uniforms.uHeroOptics.value=m.userData.isContact?ease(state.contact):1-state.heroExit;m.uniforms.uOpticsTime.value=reducedMotion?0:elapsed;m.uniforms.uLight.value.set(pointer.distanceTo(new THREE.Vector2(.5,.5))<.03?4:Math.cos(lightAngle)*9.85,pointer.distanceTo(new THREE.Vector2(.5,.5))<.03?9:Math.sin(lightAngle)*9.85,.5);});
       if(!reducedMotion && elapsed>nextSticker){nextSticker=elapsed+4; if(stickers.length<7)spawn(1);}
