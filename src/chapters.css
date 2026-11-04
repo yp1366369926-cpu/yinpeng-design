@@ -1,0 +1,78 @@
+/* Each chapter settles at the viewport edge; oversized content remains scrollable. */
+html{scroll-snap-type:y proximity;scroll-padding-top:0}
+.hero,.about,.experience,.work-screen,.contact,.tunnel-stop{scroll-snap-align:start;scroll-snap-stop:normal}
+.page .hero{height:100svh;min-height:0}
+.about,.experience{min-height:100svh;margin-block:0;padding-block:clamp(96px,12svh,160px) clamp(72px,9svh,120px)}
+.about{align-content:center}
+@media(min-width:1024px){
+ .about{grid-template-columns:minmax(0,min(40vw,calc((100svh - clamp(96px,12svh,160px) - clamp(72px,9svh,120px))*.8))) minmax(0,1fr)}
+ .about .personal-card{margin:0;max-width:100%;width:100%}
+ .about-copy{align-self:center;font-size:clamp(24px,min(3.4vw,5svh),72px);line-height:1.12}
+ .about-copy p{margin-bottom:clamp(24px,4svh,48px)}
+ .about-copy p:last-child{margin-bottom:0}
+ .experience{display:flex;flex-direction:column;justify-content:center}
+ .experience-heading{margin-bottom:clamp(24px,4svh,48px)}
+ .experience-stats{margin-bottom:clamp(24px,4svh,48px)}
+ .experience-stats>div{padding-block:clamp(20px,3svh,40px)}
+ .experience-toggle{min-height:0;padding-block:clamp(20px,3svh,40px)}
+}
+.works{display:block;padding:0;row-gap:0}
+.work-screen{min-height:100svh;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));align-content:center;align-items:center;gap:24px;padding:96px 0 80px;position:relative}
+.work-screen .work{grid-column:auto;margin:0;min-width:0}
+.work-screen .work-link{width:100%;max-width:100%;margin:auto}
+.work-screen .work-link{max-width:min(100%,calc((100svh - 230px)*1.776))}
+.work-screen .cover{max-height:none}
+.work-screen-0 .work{grid-column:4/11}
+.work-screen-1 .work:first-of-type{grid-column:1/7}.work-screen-1 .work:last-child{grid-column:7/13}
+.work-screen-2 .work:first-of-type{grid-column:3/7}.work-screen-2 .work:last-child{grid-column:8/12}
+.work-screen-3 .work:nth-of-type(1){grid-column:1/5}.work-screen-3 .work:nth-of-type(2){grid-column:5/9}.work-screen-3 .work:nth-of-type(3){grid-column:9/13}
+.work-screen-3 .work:first-of-type .work-link{max-width:calc((100svh - 230px)*.711)}
+.work-screen-3 .work:not(:first-of-type) .work-link{max-width:calc(100svh - 230px)}
+.work-chapter-label{position:absolute;top:clamp(84px,10svh,140px);left:8px;font:12px/1.5 departure,monospace;letter-spacing:.05em;color:#888983}
+.tunnel{height:400svh}
+.tunnel-stop{position:absolute;left:0;right:0;height:100svh;pointer-events:none}
+.contact{height:100svh;min-height:0}
+@media(max-width:1023px){
+ .about{display:flex;flex-direction:column;justify-content:center;gap:32px;padding-top:100px}
+ .about .personal-card{width:min(100%,440px);margin:0 auto 16px}
+ .about-copy{font-size:clamp(20px,3vw,32px);line-height:1.3}
+ .about-copy p:last-child{margin-bottom:0}
+ .experience-heading h2{font-size:clamp(24px,5vw,40px)}
+ .experience-stats{margin-bottom:24px}.experience-stats>div{padding:18px 12px!important}.experience-stats strong{font-size:40px}
+ .experience-toggle{padding-block:20px}
+ .work-screen{grid-template-columns:minmax(0,1fr);padding:100px 8px 80px;gap:0}
+ .work-screen .work{grid-column:1!important;grid-row:auto!important;padding:0;width:100%}
+ .work-screen .work-link{max-width:100%}
+ .work-screen .cover{max-height:none}
+ .work-screen-3 .work:first-of-type .work-link{max-width:min(100%,calc((100svh - 220px)*.711))}
+ .work-screen-3 .work:not(:first-of-type) .work-link{max-width:min(100%,calc(100svh - 220px))}
+ .work-chapter-label{top:76px}
+ .contact-links{bottom:72px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-snap-type:none;scroll-behavior:auto}}
+
+@media(max-width:1023px){.work-screen{display:contents}.work-screen .work{display:flex;min-height:100svh;align-items:center;padding:100px 8px 80px;scroll-snap-align:start}.work-chapter-label{display:none}.work-screen .work-link{max-width:min(100%,calc((100svh - 220px)*1.776))}.work-screen-3 .work:not(:first-of-type) .work-link{max-width:min(100%,calc(100svh - 220px))}}
+
+/* Scrub all typography and particles from the same scroll envelope. */
+.tunnel .purpose-title,.tunnel .human-title,.tunnel .future-title,.tunnel .values{color:#fff;transition:none;will-change:opacity;pointer-events:none}
+.tunnel .purpose-title{opacity:var(--primary-opacity,0)}
+.tunnel .human-title{opacity:var(--human-opacity,0)}
+.tunnel .values{opacity:var(--values-opacity,0)}
+.tunnel .future-title{opacity:var(--future-opacity,0)}
+.tunnel .motion-letter{animation:none!important;filter:none;opacity:1}
+
+/* Reference hyperspace: eight viewport segments, four typography stages. */
+.tunnel{height:800svh;scroll-snap-align:none}
+.tunnel-stop{scroll-snap-align:none}
+.tunnel .purpose-title,.tunnel .human-title,.tunnel .future-title{font-size:6.8svw;line-height:1;color:inherit}
+.tunnel .values{color:inherit;inset:96px 56px;grid-template-rows:repeat(6,1fr);font-size:30px}
+.tunnel .values p:nth-of-type(1){grid-column:7/11;grid-row:2}
+.tunnel .values p:nth-of-type(2){grid-column:9/13;grid-row:3}
+.tunnel .values p:nth-of-type(3){grid-column:2/6;grid-row:4}
+.tunnel .values p:nth-of-type(4){grid-column:4/8;grid-row:5}
+.tunnel{transition:color .2s;color:#070909}.in-tunnel .tunnel{color:#fff}.dark .tunnel{color:#fff}
+.tunnel-rings{position:absolute;width:344px;height:344px;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
+.page[data-tunnel-stage="primary"] .purpose-title .motion-letter,.page[data-tunnel-stage="human"] .human-title .motion-letter,.page[data-tunnel-stage="values"] .values .motion-letter,.page[data-tunnel-stage="future"] .future-title .motion-letter{animation:reference-letter .23s var(--letter-delay) linear both!important}
+@keyframes reference-letter{from{opacity:0}to{opacity:1}}
+@media(max-width:1023px){.tunnel .purpose-title,.tunnel .human-title,.tunnel .future-title{font-size:7.2svw}.tunnel .values{inset:72px 16px;font-size:5.6svw;grid-template-columns:repeat(12,1fr)}.tunnel .values p:nth-of-type(1){grid-column:1/9}.tunnel .values p:nth-of-type(2){grid-column:5/13}.tunnel .values p:nth-of-type(3){grid-column:1/9}.tunnel .values p:nth-of-type(4){grid-column:5/13}}
+@media(prefers-reduced-motion:reduce){.tunnel .motion-letter{animation:none!important}}

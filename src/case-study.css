@@ -1,0 +1,70 @@
+.case-study {
+  --case-line: #c4c9c7;
+  min-height: 100svh;
+  background: #faf9f6;
+  color: #070909;
+  font-family: tiktok, 'PingFang SC', sans-serif;
+}
+.case-study .case-header {
+  position: sticky;
+  inset: 0 0 auto;
+  padding: 22px clamp(16px, 4vw, 56px);
+  background: #faf9f6f2;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--case-line);
+  font: 14px departure, 'PingFang SC', monospace;
+}
+.case-brand { font: 800 16px tiktok, sans-serif; }
+.case-body {
+  width: calc(100% - clamp(32px, 8vw, 112px));
+  max-width: 1440px;
+  margin: auto;
+  border-inline: 1px solid var(--case-line);
+}
+.case-intro, .case-section { padding: clamp(22px, 4vw, 58px); }
+.case-kicker { font: 14px departure, monospace; color: #52615d; }
+.case-intro h1 {
+  font-size: clamp(36px, 6vw, 92px);
+  padding: 0;
+  margin: 18px 0;
+  line-height: 1.1;
+}
+.case-intro p { max-width: 44em; font-size: clamp(16px, 2vw, 22px); line-height: 1.6; }
+.case-external, .case-return {
+  display: inline-block;
+  background: #c0fe04;
+  padding: 10px 14px;
+  font: 15px departure, 'PingFang SC', monospace;
+}
+.case-cover, .case-gallery img { display: block; width: 100%; height: auto; }
+.case-video {
+  display: block;
+  width: 100%;
+  height: min(72svh, 780px);
+  object-fit: contain;
+  background: #080b10;
+}
+.case-section { border-top: 1px solid var(--case-line); }
+.case-section h2 { margin: 14px 0 24px; font-size: clamp(24px, 3vw, 40px); }
+.case-gallery { display: grid; gap: 16px; align-items: start; }
+.case-gallery.phones { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.case-gallery.pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.case-return { margin: clamp(22px, 4vw, 58px); }
+@media (max-width: 650px) {
+  .case-gallery.phones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .case-gallery.pairs { grid-template-columns: minmax(0, 1fr); }
+}
+
+.case-gallery.lobby-row {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(4px, 1vw, 14px);
+}
+.case-study-migu .case-cover {
+  width: min(calc(100% - 44px), 720px);
+  margin-inline: auto;
+  margin-bottom: clamp(22px, 4vw, 58px);
+}
+.case-study-migu .case-gallery {
+  max-width: 720px;
+  margin-inline: auto;
+}
