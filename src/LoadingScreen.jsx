@@ -3,7 +3,7 @@ import {loadingProgress} from './loading-progress.js';
 import './loading-screen.css';
 import GradientASCII from './GradientASCII';
 
-export function LoadingScreen({ready,progress,error,onComplete}){
+export function LoadingScreen({ready,progress,error,onReveal,onComplete}){
   const [value,setValue]=useState(0),[phase,setPhase]=useState('loading');
   const inputs=useRef({ready,progress});inputs.current={ready,progress};
   const reduced=useRef(matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -30,9 +30,10 @@ export function LoadingScreen({ready,progress,error,onComplete}){
   },[phase]);
   useEffect(()=>{
     if(phase!=='revealing')return;
+    onReveal();
     const timer=setTimeout(onComplete,reduced.current?0:1450);
     return()=>clearTimeout(timer);
-  },[phase,onComplete]);
+  },[phase,onReveal,onComplete]);
   return <div className={`loading-screen is-${phase}${error?' has-error':''}`}>
     <div className="loading-veil" aria-hidden="true"/>
     <div className="loading-panel" aria-hidden="true"/>

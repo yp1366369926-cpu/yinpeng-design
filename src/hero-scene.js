@@ -11,10 +11,13 @@ const quadVertex = `varying vec2 vUv; void main(){vUv=uv;gl_Position=vec4(positi
 const u = value => ({ value });
 const color = hex => new THREE.Color(hex);
 
-export async function createHeroScene(host, { onReady, onError, onProgress, reducedMotion }) {
+export async function createHeroScene(host, { onReady, onError, onProgress, reducedMotion, waitForReveal = false }) {
   const fluidPointer=createFluidPointer();
   let fluid,papers;
   let disposed = false, raf, elapsed = 0, last = performance.now(), pulse = 0;
+  let revealed = !waitForReveal;
+  let firstFrame = true;
+  function reveal() { revealed = true; }
   const renderer = new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -148,15 +151,15 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
     arrowStripe=new THREE.ShaderMaterial({vertexShader:arrowVs,fragmentShader:arrowFs,transparent:true,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,uniforms:{iResolution:u(new THREE.Vector3()),iTime:u(0),uScrollDuration:u(2),uAccentColor:u(color('#009dff')),uStripeColorA:u(color('#009dff')),uStripeColorB:u(color('#64c3ff')),uStripeReveal:u(0),uOpacity:u(1),uLight:u(new THREE.Vector3(4,9,.5)),uShininess:u(120),uDiffuseness:u(.1),uSpecularStrength:u(.3),uFresnelPower:u(1),uFresnelStrength:u(.24),uFresnelSideDir:u(new THREE.Vector3(-1,1,-1))}});resources.push(arrowStripe);
     papers=await createPaperLayers(scene,{reducedMotion});
     setTheme(false);resize();spawn(8,true);
-    const started=performance.now();
+
     let arrowScale=.1;
     arrow.geometry.computeBoundingSphere();const arrowRadius=Math.max(arrow.geometry.boundingSphere.radius,.0001);
     const ringEllipses=Array.from(document.querySelectorAll('.tunnel-rings ellipse'));
     function frame(now){
       if(disposed)return;
-      const dt=Math.min((now-last)/1000,.04);last=now;elapsed+=dt;
+      const dt=revealed?Math.min((now-last)/1000,.04):0;last=now;elapsed+=dt;
       smooth.lerp(pointer,1-Math.exp(-dt*5));pulse=Math.max(0,pulse-dt*.7);
-      const entry=reducedMotion?1:Math.min(1,(now-started)/1500),entryEase=1-Math.pow(1-entry,3);
+      const entry=reducedMotion?1:Math.min(1,(elapsed+(waitForReveal ? .35 : 0))/1.5),entryEase=1-Math.pow(1-entry,3);
       const tunnelTop=tunnelEl.offsetTop,contactTop=contactEl.offsetTop;
       const state=scrollState(scrollY,height,tunnelTop,tunnelEl.offsetHeight,contactTop);
       flat.uniforms.uColor.value.copy(color(dark?'#181817':'#faf9f6'));flat.uniforms.uAlpha.value=1-state.glass;
@@ -229,9 +232,14 @@ export async function createHeroScene(host, { onReady, onError, onProgress, redu
       quad.material=flareMaterial;renderer.setRenderTarget(flareTarget);renderer.render(passScene,ortho);
       quad.material=compositeMaterial;renderer.setRenderTarget(compositeTarget);renderer.render(passScene,ortho);
       fluid.render(compositeTarget,{...fluidPointer.sample(now,{width,height,dpr:renderer.getPixelRatio(),mobile,reducedMotion}),heroOptics:Math.max(1-state.heroExit,ease(state.contact))});
+      if(firstFrame){
+        firstFrame=false;
+        onProgress?.(1);
+        onReady();
+      }
       raf=requestAnimationFrame(frame);
     }
-    raf=requestAnimationFrame(frame);onProgress?.(1);onReady();
+    raf=requestAnimationFrame(frame);
   }catch(error){onError(error);}
-  return {setTheme,burst:()=>{pulse=1;spawn(9);},dispose(){disposed=true;cancelAnimationFrame(raf);observer.disconnect();host.parentElement.removeEventListener('pointermove',move);host.parentElement.removeEventListener('pointerleave',leave);host.parentElement.removeEventListener('pointerdown',click);stickers.forEach(s=>{s.mesh.geometry.dispose();s.mesh.material.dispose();});papers?.dispose();fluid?.dispose();resources.forEach(r=>r.dispose());quad.geometry.dispose();renderer.dispose();renderer.domElement.remove();}};
+  return {setTheme,reveal,burst:()=>{pulse=1;spawn(9);},dispose(){disposed=true;cancelAnimationFrame(raf);observer.disconnect();host.parentElement.removeEventListener('pointermove',move);host.parentElement.removeEventListener('pointerleave',leave);host.parentElement.removeEventListener('pointerdown',click);stickers.forEach(s=>{s.mesh.geometry.dispose();s.mesh.material.dispose();});papers?.dispose();fluid?.dispose();resources.forEach(r=>r.dispose());quad.geometry.dispose();renderer.dispose();renderer.domElement.remove();}};
 }
