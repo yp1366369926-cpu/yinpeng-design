@@ -15,7 +15,10 @@ export function createFluidPointer() {
         previous = position;
         if (dx * dx + dy * dy > 1) lastMotion = now;
       } else { dx *= .9; dy *= .9; }
-      return { position, delta: [dx, dy], enabled: !mobile && !reducedMotion && now - lastMotion <= 600 };
+      const idle = now - lastMotion;
+      const enabled = !mobile && !reducedMotion && idle <= 600;
+      const fade = enabled ? Math.max(0, Math.min(1, (600 - idle) / 180)) : 0;
+      return { position, delta: [dx, dy], enabled, fade: fade * fade * (3 - 2 * fade) };
     }
   };
 }

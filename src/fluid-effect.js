@@ -8,7 +8,7 @@ const u = value => ({ value });
 export async function createFluidEffect(renderer) {
   const names = ['curlMaterial','vorticityMaterial','divergenceMaterial','clearMaterial','pressureMaterial','gradientMaterial','advectMaterial','displayMaterial'];
   const shaders = await Promise.all(names.map(async name => {
-    const response = await fetch(`./assets/fluid/${name}.frag`);
+    const response = await fetch(`./assets/fluid/${name}.frag?v=melt-1`);
     if (!response.ok) throw Error(`Fluid shader unavailable: ${name}`);
     return response.text();
   }));
@@ -50,6 +50,7 @@ export async function createFluidEffect(renderer) {
     render(input,sample){
       pointer.set(...sample.position);delta.set(...sample.delta);
       if(sample.enabled){
+        forcePass.uniforms.uCurlStrength.value=12*(sample.heroOptics??0);
         curlPass.uniforms.uVelocity.value=velocityRead.texture;draw(curlPass,curl);
         forcePass.uniforms.uVelocity.value=velocityRead.texture;forcePass.uniforms.uCurl.value=curl.texture;draw(forcePass,vorticity);
         divergencePass.uniforms.uVelocity.value=vorticity.texture;draw(divergencePass,divergence);
@@ -64,7 +65,7 @@ export async function createFluidEffect(renderer) {
       displayPass.uniforms.uHeroOptics.value=sample.heroOptics??0;
       displayPass.uniforms.tDiffuse.value=input.texture;
       displayPass.uniforms.uVelocity.value=velocityRead.texture;
-      displayPass.uniforms.uEffectEnabled.value=+sample.enabled;
+      displayPass.uniforms.uEffectEnabled.value=sample.fade;
       draw(displayPass,null);
     },
     dispose(){targets.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());quad.geometry.dispose();}

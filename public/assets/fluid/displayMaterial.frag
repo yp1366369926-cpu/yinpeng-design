@@ -12,11 +12,11 @@ vec3 spectrum(float x) {
 
 vec4 getFluidDisplayColor(vec2 uv) {
   vec2 velocity = texture2D(uVelocity, uv).xy;
-  float effectEnabled = step(0.5, uEffectEnabled);
+  float effectEnabled = uEffectEnabled;
   vec2 displacement = velocity / max(uSimSize, vec2(1.0)) * uDisplacementStrength * effectEnabled;
   float velocityMagnitude = length(displacement);
   // Bounded lens displacement keeps fast strokes from tearing the glass.
-  vec2 lens = displacement * (.022 / (1.0 + velocityMagnitude * .55));
+  vec2 lens = displacement * (.16 * velocityMagnitude / (1.0 + 1.5 * velocityMagnitude * velocityMagnitude));
   float lensEnergy = smoothstep(.015, .38, velocityMagnitude);
 
   const int samples = 4; // 采样次数
@@ -27,7 +27,7 @@ vec4 getFluidDisplayColor(vec2 uv) {
     float t = float(index) / float(samples - 1);
     vec3 weight = max(vec3(0.0), cos((t - vec3(0.0, 0.5, 1.0)) * 3.14159 * 0.5));
     vec2 originalOffset = displacement * 0.3 * (t + 0.3) * velocityMagnitude;
-    vec2 lensOffset = lens * (.82 + .26 * t);
+    vec2 lensOffset = lens * (.60 + .65 * t);
     vec2 offset = mix(originalOffset, lensOffset, uHeroOptics);
     vec4 sampleColor = texture2D(tDiffuse, clamp(uv - offset, .001, .999));
     color.rgb += sampleColor.rgb * weight;
@@ -40,7 +40,7 @@ vec4 getFluidDisplayColor(vec2 uv) {
 
   vec3 spectralHighlight = spectrum(sin(velocityMagnitude * 2.0) * 0.4 + 0.6);
   color.rgb += spectralHighlight * smoothstep(0.2, 0.8, velocityMagnitude)
-               * mix(.5, .045, uHeroOptics) * uChromaticBoost * effectEnabled;
+               * mix(.5, .13, uHeroOptics) * uChromaticBoost * effectEnabled;
   color.rgb += vec3(.012, .021, .028) * lensEnergy * uHeroOptics * effectEnabled;
 
   return color;
